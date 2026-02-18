@@ -1,6 +1,8 @@
-const API_URL = "http://127.0.0.1:5000/api/student";
+// Base API URL for Render backend (student routes)
+const API_URL = "https://swara-backend-q76j.onrender.com/api/student";
 const token = localStorage.getItem("token");
 
+// Redirect to login if no token
 if (!token) {
     window.location.href = "../login.html";
 }
@@ -10,11 +12,13 @@ const userMessageInput = document.getElementById("userMessage");
 const sendBtn = document.getElementById("sendBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
+// Logout functionality
 logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "../login.html";
 });
 
+// Function to add messages to chat window
 function addMessage(sender, message) {
     const div = document.createElement("div");
     div.className = sender === "user" ? "text-right" : "text-left";
@@ -31,6 +35,7 @@ function addMessage(sender, message) {
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
+// Send message to backend
 async function sendMessage() {
     const message = userMessageInput.value.trim();
     if (!message) return;
@@ -62,8 +67,8 @@ async function sendMessage() {
     }
 }
 
+// Event listeners
 sendBtn.addEventListener("click", sendMessage);
-
 userMessageInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
 });
