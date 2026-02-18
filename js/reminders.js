@@ -1,13 +1,16 @@
-const API_URL = "http://127.0.0.1:5000/api/reminders";
+// Base API URL for Render backend (reminders)
+const API_URL = "https://swara-backend-q76j.onrender.com/api/reminders";
 const token = localStorage.getItem("token");
 
+// Redirect to login if no token
 if (!token) window.location.href = "../login.html";
 
 const reminderList = document.getElementById("reminderList");
 
+// Load reminders from backend
 async function loadReminders() {
     try {
-        const res = await fetch(API_URL + "/", {
+        const res = await fetch(`${API_URL}/`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
@@ -32,7 +35,7 @@ async function loadReminders() {
             `;
 
             li.querySelector("button").addEventListener("click", async () => {
-                await fetch(API_URL + "/" + reminder._id, {
+                await fetch(`${API_URL}/${reminder._id}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
