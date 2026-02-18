@@ -37,7 +37,9 @@ closeAi.addEventListener("click", () => aiPopup.classList.add("hidden"));
 function addMessage(sender, msg) {
     const div = document.createElement("div");
     div.className = sender === "user" ? "text-right mb-2" : "text-left mb-2";
-    div.innerHTML = `<p class="inline-block p-2 rounded ${sender==='user' ? 'bg-blue-500 text-white' : 'bg-gray-300'}">${msg}</p>`;
+    div.innerHTML = `<p class="inline-block p-2 rounded ${
+        sender==='user' ? 'bg-blue-500 text-white' : 'bg-gray-300'
+    }">${msg}</p>`;
     chatContent.appendChild(div);
     chatContent.scrollTop = chatContent.scrollHeight;
 }
@@ -49,7 +51,7 @@ async function sendMessage() {
     aiInput.value = "";
 
     try {
-        const res = await fetch("http://127.0.0.1:5000/api/student/chat", {
+        const res = await fetch("https://swara-backend-q76j.onrender.com/api/student/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -61,6 +63,7 @@ async function sendMessage() {
         addMessage("bot", data.reply);
     } catch (err) {
         addMessage("bot", "Unable to connect to server.");
+        console.error(err);
     }
 }
 
