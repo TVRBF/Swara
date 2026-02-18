@@ -1,4 +1,5 @@
-const API_URL = "http://127.0.0.1:5000/api/student";
+// Base API URL for Render backend (student tasks)
+const API_URL = "https://swara-backend-q76j.onrender.com/api/student";
 const token = localStorage.getItem("token");
 
 // Redirect if not logged in
@@ -9,7 +10,7 @@ if (!token) {
 // Fetch tasks
 async function fetchTasks() {
     const res = await fetch(`${API_URL}/tasks`, {
-        headers: { "Authorization": token }
+        headers: { "Authorization": `Bearer ${token}` }
     });
     const data = await res.json();
     displayTasks(data.tasks);
@@ -50,7 +51,7 @@ function displayTasks(tasks) {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": token
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({ completed: e.target.checked })
             });
