@@ -44,4 +44,14 @@ Admin can download student progress report in CSV format including:
 •	AI-based risk prediction
 •	Real-time chat support
 •	Document upload integration
+
 •	Dashboard analytics with charts
+
+
+Basic Login 
+Student
+mail:sahil@gmail.com
+Pass:Sahil@2007
+Admin
+mail:Swara@gmail.com
+Pass:Swara@2007
