@@ -10,28 +10,28 @@ if (!token) {
 async function fetchTasks() {
     try {
         const res = await fetch(`${API_URL}/tasks`, {
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: { "Authorization": `Bearer ${token}` } // Corrected header
         });
 
         if (!res.ok) {
             console.error("Failed to fetch tasks:", res.status, res.statusText);
-            alert("Failed to fetch tasks. Please log in again.");
+            alert("Session expired or unauthorized. Please log in again.");
+            localStorage.removeItem("token");
             window.location.href = "login.html";
             return;
         }
 
         const data = await res.json();
-
-        if (!Array.isArray(data.tasks)) {
-            console.warn("Tasks not found or invalid format:", data);
-            document.getElementById("tasksList").innerHTML = "<li>No tasks available</li>";
+        if (!data.tasks) {
+            console.error("Tasks not found:", data);
             return;
         }
 
         displayTasks(data.tasks);
     } catch (err) {
         console.error("Error fetching tasks:", err);
-        document.getElementById("tasksList").innerHTML = "<li>Failed to connect to backend</li>";
+        alert("Unable to fetch tasks. Please check your internet or login again.");
+        window.location.href = "login.html";
     }
 }
 
@@ -55,15 +55,13 @@ function displayTasks(tasks) {
     });
 
     const percent = tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0;
-    const progressBar = document.getElementById("progressBar");
-    const progressPercent = document.getElementById("progressPercent");
-    if (progressBar) progressBar.style.width = percent + "%";
-    if (progressPercent) progressPercent.innerText = percent + "%";
+    document.getElementById("progressBar").style.width = percent + "%";
+    document.getElementById("progressPercent").innerText = percent + "%";
 
-    // Checkbox updates
+    // Checkbox update
     document.querySelectorAll("input[type=checkbox]").forEach(cb => {
         cb.addEventListener("change", async (e) => {
-            const taskId = e.target.getAttribute("data-id");
+            const taskId = e.target.dataset.id;
             await fetch(`${API_URL}/tasks/${taskId}`, {
                 method: "PUT",
                 headers: {
@@ -76,5 +74,11 @@ function displayTasks(tasks) {
         });
     });
 }
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+});
 
 fetchTasks();
