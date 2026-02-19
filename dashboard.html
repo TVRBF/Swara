@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Student Dashboard</title>
-    <link href="../css/output.css" rel="stylesheet">
-    <link href="../css/custom.css" rel="stylesheet">
+    <!-- Fixed CSS paths for GitHub Pages -->
+    <link href="/Swara/css/output.css" rel="stylesheet">
+    <link href="/Swara/css/custom.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
@@ -27,7 +28,7 @@
     <!-- Footer with buttons -->
     <footer class="bg-gray-100 shadow-inner p-4 flex justify-around items-center fixed bottom-0 left-0 w-full z-50">
         <!-- Reminders button -->
-        <a href="../student/reminders.html" 
+        <a href="/Swara/student/reminders.html" 
            class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:bg-blue-600 transition-all">
             Reminders
         </a>
@@ -39,20 +40,49 @@
         </button>
 
         <!-- Chat with AI button -->
-        <a href="../chatbot/chatbot.html"
+        <a href="/Swara/chatbot/chatbot.html"
            class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:bg-blue-600 transition-all">
             🤖 Chat with AI
         </a>
     </footer>
 
-    <script src="../js/student.js"></script>
+    <!-- Fixed JS path for GitHub Pages -->
+    <script src="/Swara/js/student.js"></script>
 
     <!-- Logout functionality -->
     <script>
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('token');
-            window.location.href = '../login.html';
+            window.location.href = '/Swara/login.html';
         });
+
+        // Update student.js fetch URL (optional if not already inside student.js)
+        // Example fetch function to use Render backend
+        async function fetchTasks() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const res = await fetch("https://swara-backend-q76j.onrender.com/api/student/tasks", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    }
+                });
+                const tasks = await res.json();
+                const tasksList = document.getElementById('tasksList');
+                tasksList.innerHTML = "";
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.textContent = task.name; // or task.title depending on your backend
+                    tasksList.appendChild(li);
+                });
+            } catch (err) {
+                console.error("Failed to fetch tasks:", err);
+            }
+        }
+
+        fetchTasks();
     </script>
 
 </body>
