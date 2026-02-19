@@ -3,40 +3,53 @@ const token = localStorage.getItem("token");
 
 // Redirect if not logged in
 if (!token) {
+    alert("Please log in first!");
     window.location.href = "login.html";
 }
+
+// Logout button
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+});
 
 // Fetch tasks
 async function fetchTasks() {
     try {
         const res = await fetch(`${API_URL}/tasks`, {
-            headers: { "Authorization": `Bearer ${token}` } // Corrected header
+            headers: { "Authorization": `Bearer ${token}` }
         });
 
-        if (!res.ok) {
-            console.error("Failed to fetch tasks:", res.status, res.statusText);
+        if (res.status === 403) {
             alert("Session expired or unauthorized. Please log in again.");
             localStorage.removeItem("token");
-            window.location.href = "login.html";
-            return;
+            return window.location.href = "login.html";
+        }
+
+        if (!res.ok) {
+            throw new Error(`Error: ${res.status}`);
         }
 
         const data = await res.json();
         if (!data.tasks) {
-            console.error("Tasks not found:", data);
+            console.error("Tasks not found in response:", data);
             return;
         }
 
         displayTasks(data.tasks);
     } catch (err) {
-        console.error("Error fetching tasks:", err);
-        alert("Unable to fetch tasks. Please check your internet or login again.");
+        console.error("Failed to fetch tasks:", err);
+        alert("Failed to fetch tasks. Please try logging in again.");
+        localStorage.removeItem("token");
         window.location.href = "login.html";
     }
 }
 
+// Display tasks & progress
 function displayTasks(tasks) {
     const tasksList = document.getElementById("tasksList");
+    if (!tasksList) return;
+
     tasksList.innerHTML = "";
     let completedCount = 0;
 
@@ -58,10 +71,10 @@ function displayTasks(tasks) {
     document.getElementById("progressBar").style.width = percent + "%";
     document.getElementById("progressPercent").innerText = percent + "%";
 
-    // Checkbox update
+    // Update task completion
     document.querySelectorAll("input[type=checkbox]").forEach(cb => {
         cb.addEventListener("change", async (e) => {
-            const taskId = e.target.dataset.id;
+            const taskId = e.target.getAttribute("data-id");
             await fetch(`${API_URL}/tasks/${taskId}`, {
                 method: "PUT",
                 headers: {
@@ -70,15 +83,10 @@ function displayTasks(tasks) {
                 },
                 body: JSON.stringify({ completed: e.target.checked })
             });
-            fetchTasks(); // Refresh progress
+            fetchTasks(); // Refresh tasks & progress
         });
     });
 }
 
-// Logout
-document.getElementById("logoutBtn").addEventListener("click", () => {
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
-});
-
+// Initial fetch
 fetchTasks();
