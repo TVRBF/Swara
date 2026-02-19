@@ -1,7 +1,6 @@
-// Base API URL for Render backend
 const API_URL = "https://swara-backend-q76j.onrender.com/api/auth";
 
-// -------------------- Signup Form --------------------
+// -------------------- Signup --------------------
 const signupForm = document.getElementById("signupForm");
 if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
@@ -11,7 +10,6 @@ if (signupForm) {
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
         const role = document.getElementById("role").value;
-
         const endpoint = role === "student" ? "signup/student" : "signup/admin";
 
         try {
@@ -23,16 +21,15 @@ if (signupForm) {
 
             const data = await res.json();
             alert(data.message);
-
             if (res.ok) window.location.href = "login.html";
         } catch (err) {
             console.error("Signup error:", err);
-            alert("Failed to signup. Please try again later.");
+            alert("Signup failed. Try again later.");
         }
     });
 }
 
-// -------------------- Login Form --------------------
+// -------------------- Login --------------------
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
@@ -52,25 +49,20 @@ if (loginForm) {
             alert(data.message);
 
             if (res.ok) {
-                localStorage.setItem("token", data.token); // Save token
+                localStorage.setItem("token", data.token);
 
-                // Decode JWT to get role
+                // Decode role from JWT
                 const payloadBase64 = data.token.split('.')[1];
                 const decodedPayload = JSON.parse(atob(payloadBase64));
                 const role = decodedPayload.role;
 
-                // Redirect based on role
-                if (role === "admin") {
-                    window.location.href = "admindashboard.html";
-                } else if (role === "student") {
-                    window.location.href = "dashboard.html";
-                } else {
-                    alert("Unknown role!");
-                }
+                if (role === "admin") window.location.href = "admindashboard.html";
+                else if (role === "student") window.location.href = "dashboard.html";
+                else alert("Unknown role!");
             }
         } catch (err) {
             console.error("Login error:", err);
-            alert("Failed to login. Please try again later.");
+            alert("Login failed. Try again later.");
         }
     });
 }
