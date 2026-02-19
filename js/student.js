@@ -1,25 +1,42 @@
-// Base API URL for Render backend (student tasks)
 const API_URL = "https://swara-backend-q76j.onrender.com/api/student";
 const token = localStorage.getItem("token");
 
 // Redirect if not logged in
 if (!token) {
-    window.location.href = "../login.html";
+    window.location.href = "login.html";
 }
 
 // Fetch tasks
 async function fetchTasks() {
-    const res = await fetch(`${API_URL}/tasks`, {
-        headers: { "Authorization": `Bearer ${token}` }
-    });
-    const data = await res.json();
-    displayTasks(data.tasks);
+    try {
+        const res = await fetch(`${API_URL}/tasks`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+            console.error("Failed to fetch tasks:", res.status, res.statusText);
+            alert("Failed to fetch tasks. Please log in again.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        const data = await res.json();
+
+        if (!Array.isArray(data.tasks)) {
+            console.warn("Tasks not found or invalid format:", data);
+            document.getElementById("tasksList").innerHTML = "<li>No tasks available</li>";
+            return;
+        }
+
+        displayTasks(data.tasks);
+    } catch (err) {
+        console.error("Error fetching tasks:", err);
+        document.getElementById("tasksList").innerHTML = "<li>Failed to connect to backend</li>";
+    }
 }
 
 function displayTasks(tasks) {
     const tasksList = document.getElementById("tasksList");
-    if (!tasksList) return; // If tasksList doesn't exist in HTML
-
     tasksList.innerHTML = "";
     let completedCount = 0;
 
@@ -59,15 +76,5 @@ function displayTasks(tasks) {
         });
     });
 }
-
-// Set student name
-const studentName = document.getElementById("studentName");
-if (studentName) studentName.innerText = "Student";
-
-// Logout
-document.getElementById("logoutBtn").addEventListener("click", () => {
-    localStorage.removeItem("token");
-    window.location.href = "../login.html";
-});
 
 fetchTasks();
